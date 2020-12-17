@@ -10,26 +10,26 @@ public class Operations extends InputScanner {
 		switch (op) {
 		case '+':
 			result = Additions(num1, num2);
-			System.out.println("The reult of operation " + num1 + " + " + num2 + " = " + result);
+			System.out.println("The result of operation " + num1 + " + " + num2 + " = " + result);
 			break;
 
 		case '-':
 			result = Subtraction(num1, num2);
-			System.out.println("The reult of operation " + num1 + " - " + num2 + " = " + result);
+			System.out.println("The result of operation " + num1 + " - " + num2 + " = " + result);
 			break;
 		case '*':
 			result = Multiply(num1, num2);
-			System.out.println("The reult of operation " + num1 + " * " + num2 + " = " + result);
+			System.out.println("The result of operation " + num1 + " * " + num2 + " = " + result);
 			break;
 
 		case '/':
 			result = Divide(num1, num2);
-			System.out.println("The reult of operation " + num1 + " / " + num2 + " = " + result);
+			System.out.println("The result of operation " + num1 + " / " + num2 + " = " + result);
 			break;
 			
 	
 		default:
-			System.out.println("The operation selected is not valied");
+			System.out.println("The operation selected is not valid.");
 			break;
 		}
 

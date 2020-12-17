@@ -7,7 +7,7 @@ public class InputScanner {
 	double num2;
 	double ans;
 	char op;
-	Scanner reader = new Scanner(System.in);
+
 
 	public void scaninput() {
 		Scanner reader = new Scanner(System.in);
@@ -21,8 +21,5 @@ public class InputScanner {
 
 	}
 	
-	public char checkAnymore(char y) {
-		return y;
-	}
-
+	
 }
