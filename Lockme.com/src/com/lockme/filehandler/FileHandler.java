@@ -2,35 +2,180 @@ package com.lockme.filehandler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class FileHandler {
-	String rootpath=null;
+	String rootpath = null;
 	File file;
+
 	public FileHandler(String rootpath) {
 		this.rootpath = rootpath;
-		
+
 	}
 
+	/**
+	 * This method generates a list of contents of a directory and displays it in
+	 * sorted order.
+	 */
 	public void sortFile() {
-		System.out.println("File will displayed in sorted manner");
+		File file = new File(rootpath);
+		File[] dircnt = file.listFiles();
+		Set<String> dircontent = new TreeSet<String>();
+		if (dircnt == null) {
+			System.out.println("The given directory is empty");
+		} else {
+
+			for (File f : dircnt) {
+				String fname = f.getName();
+				dircontent.add(fname);
+			}
+
+			dircontent.forEach((cnt) -> {
+				String append = " --> is  a Directory";
+				if ((new File(rootpath + "\\" + cnt)).isDirectory()) {
+					System.out.println(cnt + append);
+				} else {
+					System.out.println(cnt);
+				}
+			});
+		}
+
 	}
 
+	/**
+	 * Adds a file of the given name to the directory pointed towards by the root
+	 * path.
+	 * 
+	 * @param filename
+	 */
 	public void addFile(String filename) {
-		System.out.println("File can added to the directory mentioned:" + filename);
-		file= new File(rootpath+filename);
+
+		file = new File(rootpath + '\\' + filename);
 		try {
 			file.createNewFile();
+			System.out.println("File " + filename + " created in the directory " + this.rootpath);
 		} catch (IOException e) {
 			System.out.println("File could not be created");
 			e.printStackTrace();
 		}
 	}
 
-	public void deletefile(String filename) {
-		System.out.println("File can deleted from root directory:" + filename);
+	/**
+	 * Function deletes a file passed by the user. If a file is a Directory it
+	 * further checks its content and call function confirmDelete().
+	 * 
+	 * @param filename
+	 */
+	public void deleteFile(String filename, String rootpath) {
+		file = new File(rootpath + '\\' + filename);
+
+		if (file.exists()) {
+			if (file.isDirectory()) {
+				confirmDelete(file);
+			} else {
+				file.delete();
+				System.out.println("File " + filename + " deleted from root directory " + rootpath);
+			}
+
+		} else {
+			System.out.println("File " + filename + " do not exit in the root directory " + rootpath);
+		}
 	}
 
-	public void searchFile(String filename) {
-		System.out.println("You can search for a file exitence for :" + filename);
+	/**
+	 * Handles deleting a file based on permission from a user, if its is directory
+	 * with contents and iterates in itself to dlete all sub-folders and file.
+	 * 
+	 * @param file
+	 */
+	@SuppressWarnings("resource")
+	private void confirmDelete(File file) {
+		File[] allContents = file.listFiles();
+		if (allContents == null) {
+			file.delete();
+		} else {
+			Scanner in = new Scanner(System.in);
+			String per;
+			ArrayList<String> ar1 = new ArrayList<>(Arrays.asList(file.list()));
+			Iterator<String> itr = ar1.iterator();
+			System.out.println("The directory has the below contents :");
+
+			while (itr.hasNext()) {
+				System.out.println(itr.next());
+			}
+
+			System.out.println("Are you sure you want to delete the folder, press 'Y' to delete and 'N' to not delete");
+			per = in.next("[ny]");
+			while (true) {
+				if (per.equalsIgnoreCase("N")) {
+					System.out.println("File not deleted");
+					break;
+				} else if (per.equalsIgnoreCase("Y")) {
+					for (File f1 : allContents) {
+						deleteFile(f1.getName(), f1.getParent());
+					}
+					deleteFile(file.getName(), file.getParent());
+
+					break;
+				} else {
+					System.out.println("Enter either Y/N to give permission");
+				}
+			}
+		}
+
 	}
+
+	/**
+	 * Search a file in a directory and its sub-directories. Displays the absolute
+	 * path for the matching search results.
+	 * E-num data type, searchType defines the kind of search
+	 * @param searchPhrase
+	 * @param type
+	 */
+	public void searchFile(String searchPhrase, SearchType type) {
+		file = new File(rootpath);
+		File[] content;
+		switch (type) {
+		case EXACT:
+			content = (File[]) file.listFiles((dir, name) -> name.equals(searchPhrase));
+			break;
+		case CONTAINS:
+			content = (File[]) file.listFiles((dir, name) -> name.contains(searchPhrase));
+			break;
+		case STARTS_WITH:
+			content = (File[]) file.listFiles((dir, name) -> name.startsWith(searchPhrase));
+			break;
+		case END_WITH:
+			content = (File[]) file.listFiles((dir, name) -> name.endsWith(searchPhrase));
+			break;
+		case BY_EXTENSION:
+			content = (File[]) file.listFiles((dir, name) -> name.endsWith(searchPhrase));
+			break;
+		case MATCH:
+			content = (File[]) file.listFiles((dir, name) -> name.matches(searchPhrase));
+			break;
+		default:
+			content = (File[]) file.listFiles((dir, name) -> name.contentEquals(searchPhrase));
+			break;
+		}
+
+		if (content != null) {
+			for (File matches : content) {
+				if (matches.isDirectory()) {
+					searchFile(searchPhrase, type);
+				} else {
+					System.out.println("File Found in the given root directory :" + matches.getAbsolutePath());
+				}
+			}
+		} else {
+			System.out.println("File not Found in the given directory");
+		}
+
+	}
+
 }

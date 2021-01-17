@@ -1,54 +1,66 @@
 package com.lockme.app;
 
 import java.io.File;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import com.lockme.filehandler.FileHandler;
+import com.lockme.filehandler.SearchType;
 
 public class OperationsCall {
-	static String root;
+	String rootpath;
 	static Scanner input;
 	static Scanner name;
-	public static void testroot(String rootpath) {
-		File file;
-		while(true) {
-		file=new File(rootpath);
-		System.out.println(file.getAbsolutePath());
-		
+	static FileHandler fh;
+
+	/**
+	 * This function accepts user input for root directory and exits on providing, a
+	 * valid directory path.
+	 */
+	public void getroot() {
+		System.out.println("Please Enter the root directory");
+		while (true) {
+			String rootpath = readStringInput();
+			File file = new File(rootpath);
 			if (file.isDirectory()) {
-				System.out.println("Root Path Accepted");
-				root = rootpath;
+				System.out.println("Root Path Accepted : " + file.getAbsolutePath());
+				this.rootpath = rootpath;
 				break;
-			
+
 			} else {
-				
 				System.out.println("Invalid directory path, please enter the correct rootpath");
-				rootpath = readFile();
-				System.out.println(rootpath);
 			}
 		}
 	}
 
-	public static int mainOptions() {
-		System.out.println("Select from the below list of operations: ");
-		System.out.println("1.Retrieve the file names in an ascending order");
-		System.out.println("2.Business-level operations:");
-		System.out.println("3.CLose the aplication");
-		return readInput();
-	}
-
+	/**
+	 * This reads the options for selecting choice, reads integer options for both
+	 * main and sub-level functions.
+	 * 
+	 * @return integer option selected.
+	 */
 	public static int readInput() {
 		input = new Scanner(System.in);
 		int choice;
 		if (input.hasNext()) {
-			choice = input.nextInt();
+			try {
+				choice = input.nextInt();
+			} catch (InputMismatchException m) {
+				System.out.println("Enter valid input");
+				choice = 1;
+			}
 		} else {
 			choice = 1;
 		}
 		return choice;
 	}
 
-	public static String readFile() {
+	/**
+	 * Accepts string input, for directory path and file name as string from user
+	 * 
+	 * @return return string path or filename read.
+	 */
+	public static String readStringInput() {
 		name = new Scanner(System.in);
 		String file;
 		if (name.hasNext()) {
@@ -58,20 +70,51 @@ public class OperationsCall {
 		}
 		return file;
 	}
+	
 
-	public static void operations(int choice) {
+	public void mainOptions() {
+		System.out.println("***********************************************");
+		System.out.println("Select from the below list of operations: ");
+		System.out.println("***********************************************");
+		System.out.println("1.Retrieve the file names in an ascending order");
+		System.out.println("2.Business-level operations:");
+		System.out.println("3.Close the aplication");
+		System.out.println("***********************************************");
+
+	}
+
+	/**
+	 * Calls function corresponding to user choice, perform the action chosen by the
+	 * user.
+	 * 
+	 * @param choice
+	 */
+	public void parentOptions() {
+		System.out.println("***********************************************");
+		System.out.println("Select from the below list of operations: ");
+		System.out.println("***********************************************");
+		System.out.println("1.Retrieve the file names in an ascending order");
+		System.out.println("2.Business-level operations:");
+		System.out.println("3.Close the aplication");
+		System.out.println("***********************************************");
+		int choice = readInput();
 		switch (choice) {
 		case 1:
-			System.out.println("Diplay file to in ascending order:");
+			// Display file to in ascending order:
+			fh = new FileHandler(rootpath);
+			fh.sortFile();
 			break;
+
 		case 2:
-			System.out.println("Choose from the below bussiness opertaions");
-			FileHandler fh = new FileHandler(root);
-			secondaryOptions(fh);
+			// Displays the sub-level feature.
+			secondaryOptions();
 			break;
+
 		case 3:
+			
 			input.close();
 			name.close();
+			System.out.println("\\t\" + \"\\t\" + \"\\t\" + \"\\t\" + \"************LOCKME.COM APPLICATION CLOSED************\" + \"\\t");
 			System.exit(0);
 			break;
 		default:
@@ -80,43 +123,77 @@ public class OperationsCall {
 		}
 	}
 
-	public static void secondaryOptions(FileHandler fh) {
-		System.out.println("Select from the below list of operations: ");
-		System.out.println("1.Add a file to the existing directory list");
-		System.out.println("2.Delete a file from the application");
-		System.out.println("3.Search a file from the main directory");
-		System.out.println("4.Navigate back to the main context");
-		String filename;
-		int choice = readInput();
-		switch (choice) {
-		case 1:
-			System.out.println("Options 1 selected");
-			System.out.println("Enter File name : ");
-			filename = readFile();
-			fh = new FileHandler(root);
-			fh.addFile(filename);
-			break;
-		case 2:
-			System.out.println("Options 2 selected");
-			System.out.println("Enter File name : ");
-			filename = readFile();
-			fh = new FileHandler(root);
-			fh.deletefile(filename);
-			break;
-		case 3:
-			System.out.println("Options 3 selected");
-			System.out.println("Enter File name : ");
-			filename = readFile();
-			fh = new FileHandler(root);
-			fh.searchFile(filename);
-			break;
-		case 4:
-			System.out.println("Options 4 selected");
-			mainOptions();
-			break;
-		default:
-			System.out.println("Please choose from the given options");
-			break;
+	/**
+	 * Calls sub-level functions as per the input of the user. User must choose by
+	 * typing in the integer value against the desired operation.
+	 */
+	public void secondaryOptions() {
+		boolean loop=true;
+		while (loop) {
+			
+			System.out.println("*********************************************");
+			System.out.println("Select from the below bussiness opertaions : ");
+			System.out.println("*********************************************");
+			System.out.println("1.Add a file to the existing directory list");
+			System.out.println("2.Delete a file from the application");
+			System.out.println("3.Search a file from the main directory");
+			System.out.println("4.Navigate back to the main context");
+			System.out.println("*********************************************");
+
+			String filename;
+			int choice = readInput();
+
+			// switch logic to choose operation according to choice.
+			switch (choice) {
+			case 1:
+				System.out.println("-------------------");
+				System.out.println("Options 1 selected");
+				System.out.println("-------------------");
+				System.out.println("Enter File name : ");
+				filename = readStringInput();
+				fh = new FileHandler(rootpath);
+				fh.addFile(filename);
+				break;
+			case 2:
+				System.out.println("-------------------");
+				System.out.println("Options 2 selected");
+				System.out.println("-------------------");
+				System.out.println("Enter File name : ");
+				filename = readStringInput();
+				fh = new FileHandler(rootpath);
+				fh.deleteFile(filename, rootpath);
+				break;
+			case 3:
+				System.out.println("-------------------");
+				System.out.println("Options 3 selected");
+				System.out.println("-------------------");
+				System.out.println("Please enter the type of search from the below options:");
+				SearchType type = searchMode();
+				System.out.println("Enter File name : ");
+				filename = readStringInput();
+				fh = new FileHandler(rootpath);
+				fh.searchFile(filename,type);
+				break;
+			case 4:
+				System.out.println("-----------------------------------------------------");
+				System.out.println("Options 4 selected, Navaigating back to the main menu");
+				System.out.println("-----------------------------------------------------");
+				loop= false;
+				break;
+			default:
+				System.out.println("Please choose from the given options");
+				break;
+			}
 		}
+	}
+
+	public SearchType searchMode() {
+		System.out.println("EXACT--for exact search,CONTAINS--any matches returned");
+		System.out.println("STARTS_WITH--returns files begining with search phrase");
+		System.out.println("END_WITH --returns file ending with earch phrase, ");
+		System.out.println("BY_EXTENSION -- returns file of the extension searched");
+		System.out.println("MATCH--search returns file matching given regex");
+		SearchType type = SearchType.valueOf(readStringInput());
+		return type;
 	}
 }
