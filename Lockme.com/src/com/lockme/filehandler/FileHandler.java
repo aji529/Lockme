@@ -5,19 +5,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class FileHandler {
 	String rootpath = null;
-	File file;
-
+	
 	public FileHandler(String rootpath) {
 		this.rootpath = rootpath;
-
 	}
 
+	
+	
+	
 	/**
 	 * This method generates a list of contents of a directory and displays it in
 	 * sorted order.
@@ -25,7 +25,7 @@ public class FileHandler {
 	public void sortFile() {
 		File file = new File(rootpath);
 		File[] dircnt = file.listFiles();
-		Set<String> dircontent = new TreeSet<String>();
+		List<String> dircontent = new ArrayList<String>();
 		if (dircnt == null) {
 			System.out.println("The given directory is empty");
 		} else {
@@ -34,7 +34,7 @@ public class FileHandler {
 				String fname = f.getName();
 				dircontent.add(fname);
 			}
-
+			dircontent.sort(String::compareToIgnoreCase);
 			dircontent.forEach((cnt) -> {
 				String append = " --> is  a Directory";
 				if ((new File(rootpath + "\\" + cnt)).isDirectory()) {
@@ -47,6 +47,9 @@ public class FileHandler {
 
 	}
 
+	
+	
+	
 	/**
 	 * Adds a file of the given name to the directory pointed towards by the root
 	 * path.
@@ -55,7 +58,7 @@ public class FileHandler {
 	 */
 	public void addFile(String filename) {
 
-		file = new File(rootpath + '\\' + filename);
+		File file = new File(rootpath + '\\' + filename);
 		try {
 			file.createNewFile();
 			System.out.println("File " + filename + " created in the directory " + this.rootpath);
@@ -65,6 +68,9 @@ public class FileHandler {
 		}
 	}
 
+	
+	
+	
 	/**
 	 * Function deletes a file passed by the user. If a file is a Directory it
 	 * further checks its content and call function confirmDelete().
@@ -72,7 +78,7 @@ public class FileHandler {
 	 * @param filename
 	 */
 	public void deleteFile(String filename, String rootpath) {
-		file = new File(rootpath + '\\' + filename);
+		File file = new File(rootpath + '\\' + filename);
 
 		if (file.exists()) {
 			if (file.isDirectory()) {
@@ -87,6 +93,8 @@ public class FileHandler {
 		}
 	}
 
+	
+	
 	/**
 	 * Handles deleting a file based on permission from a user, if its is directory
 	 * with contents and iterates in itself to dlete all sub-folders and file.
@@ -130,15 +138,28 @@ public class FileHandler {
 
 	}
 
+		
 	/**
 	 * Search a file in a directory and its sub-directories. Displays the absolute
-	 * path for the matching search results.
-	 * E-num data type, searchType defines the kind of search
+	 * path for the matching search results. E-num data type, searchType defines the
+	 * kind of search
+	 * 
 	 * @param searchPhrase
 	 * @param type
+	 * @param rootpath
+	 * @param searchMode
+	 * @return
 	 */
-	public void searchFile(String searchPhrase, SearchType type) {
-		file = new File(rootpath);
+	public boolean searchFile(String searchPhrase, SearchType type, String rootpath, boolean searchMode) {
+		boolean searchResult = false;
+		File file = new File(rootpath);
+		File[] allContent = file.listFiles();
+		if (allContent != null && searchMode) {
+			for (File inside : allContent) {
+				if (inside.isDirectory())
+					searchResult = searchResult | searchFile(searchPhrase, type, inside.getAbsolutePath(), searchMode);
+			}
+		}
 		File[] content;
 		switch (type) {
 		case EXACT:
@@ -150,14 +171,8 @@ public class FileHandler {
 		case STARTS_WITH:
 			content = (File[]) file.listFiles((dir, name) -> name.startsWith(searchPhrase));
 			break;
-		case END_WITH:
-			content = (File[]) file.listFiles((dir, name) -> name.endsWith(searchPhrase));
-			break;
 		case BY_EXTENSION:
 			content = (File[]) file.listFiles((dir, name) -> name.endsWith(searchPhrase));
-			break;
-		case MATCH:
-			content = (File[]) file.listFiles((dir, name) -> name.matches(searchPhrase));
 			break;
 		default:
 			content = (File[]) file.listFiles((dir, name) -> name.contentEquals(searchPhrase));
@@ -166,16 +181,14 @@ public class FileHandler {
 
 		if (content != null) {
 			for (File matches : content) {
-				if (matches.isDirectory()) {
-					searchFile(searchPhrase, type);
-				} else {
-					System.out.println("File Found in the given root directory :" + matches.getAbsolutePath());
-				}
+				System.out.println("File Found in the given root directory :" + matches.getAbsolutePath());
+				searchResult = true;
 			}
 		} else {
-			System.out.println("File not Found in the given directory");
+			searchResult = false;
 		}
 
+		return searchResult;
 	}
 
 }

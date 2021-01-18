@@ -13,6 +13,8 @@ public class OperationsCall {
 	static Scanner name;
 	static FileHandler fh;
 
+	
+	
 	/**
 	 * This function accepts user input for root directory and exits on providing, a
 	 * valid directory path.
@@ -33,6 +35,9 @@ public class OperationsCall {
 		}
 	}
 
+	
+	
+	
 	/**
 	 * This reads the options for selecting choice, reads integer options for both
 	 * main and sub-level functions.
@@ -55,6 +60,8 @@ public class OperationsCall {
 		return choice;
 	}
 
+	
+	
 	/**
 	 * Accepts string input, for directory path and file name as string from user
 	 * 
@@ -72,6 +79,7 @@ public class OperationsCall {
 	}
 	
 
+	
 	public void mainOptions() {
 		System.out.println("***********************************************");
 		System.out.println("Select from the below list of operations: ");
@@ -83,6 +91,9 @@ public class OperationsCall {
 
 	}
 
+	
+	
+	
 	/**
 	 * Calls function corresponding to user choice, perform the action chosen by the
 	 * user.
@@ -123,6 +134,8 @@ public class OperationsCall {
 		}
 	}
 
+	
+	
 	/**
 	 * Calls sub-level functions as per the input of the user. User must choose by
 	 * typing in the integer value against the desired operation.
@@ -169,10 +182,11 @@ public class OperationsCall {
 				System.out.println("-------------------");
 				System.out.println("Please enter the type of search from the below options:");
 				SearchType type = searchMode();
-				System.out.println("Enter File name : ");
+				boolean subSearch = subSearch();
+				System.out.println("Enter Search Phrase or regex : ");
 				filename = readStringInput();
 				fh = new FileHandler(rootpath);
-				fh.searchFile(filename,type);
+				fh.searchFile(filename,type,this.rootpath, subSearch);
 				break;
 			case 4:
 				System.out.println("-----------------------------------------------------");
@@ -187,13 +201,48 @@ public class OperationsCall {
 		}
 	}
 
+	
+	
+	
+	
+	/**
+	 * Asks whether user prefers a top level search, a detailed search that searches the sub-folder.
+	 * @return boolean value.
+	 */
+	public boolean subSearch() {
+		System.out.println("Do you wish to search the sub-folders for matches? Type true or false :");
+		boolean sub = false; 
+		if(readStringInput().toLowerCase().contentEquals("true")) {
+			sub = true;
+		}
+		return sub;
+	}
+
+	
+	
+	
+	
+	/**
+	 * This method allows the user to choose from type of search.
+	 * "EXACT        --search returns result that is an exact match
+	 * "CONTAINS     --search returns file that contains search value
+	`* "STARTS_WITH  --returns files starting with search phrase");
+	 * "BY_EXTENSION -- returns file of the extension searched
+	 * @return type selected by user, in case of illegal argument type passed is EXACT.
+	 */
 	public SearchType searchMode() {
-		System.out.println("EXACT--for exact search,CONTAINS--any matches returned");
-		System.out.println("STARTS_WITH--returns files begining with search phrase");
-		System.out.println("END_WITH --returns file ending with earch phrase, ");
-		System.out.println("BY_EXTENSION -- returns file of the extension searched");
-		System.out.println("MATCH--search returns file matching given regex");
-		SearchType type = SearchType.valueOf(readStringInput());
+		System.out.println("EXACT        --search returns result that is an exact match");
+		System.out.println("CONTAINS     --search returns file that contains search value ");
+		System.out.println("STARTS_WITH  --returns files starting with search phrase");
+		System.out.println("BY_EXTENSION --returns file of the extension searched");
+		SearchType type;
+		try {
+			 type = SearchType.valueOf(readStringInput().toUpperCase());
+		}
+		catch(IllegalArgumentException e) {
+			System.out.println("The Search type entered is not valid.");
+			type = SearchType.EXACT;
+		}
 		return type;
 	}
 }
