@@ -17,6 +17,7 @@ public class FileHandler {
 
 	}
 
+	
 	/**
 	 * This method generates a list of contents of a directory and displays it in
 	 * sorted order.
@@ -60,6 +61,7 @@ public class FileHandler {
 
 	}
 
+	
 	/**
 	 * Adds a file of the given name to the directory pointed towards by the root
 	 * path.
@@ -69,6 +71,7 @@ public class FileHandler {
 	public void addFile(String filename) {
 
 		File file = new File(rootpath + '\\' + filename);
+		
 		try {
 			if (file.exists()) {
 
@@ -90,6 +93,7 @@ public class FileHandler {
 
 	}
 
+	
 	/**
 	 * Function deletes a file passed by the user. If a file is a Directory it
 	 * further checks its content and call function confirmDelete().
@@ -127,9 +131,11 @@ public class FileHandler {
 
 	}
 
+	
 	/**
-	 * Handles deleting a file based on permission from a user, if its is directory
-	 * with contents and iterates in itself to delete all sub-folders and file.
+	 * Handles deleting a file based on permission from a user, if it a is directory
+	 * with contents and function iterates in itself to delete all sub-folders and
+	 * file.
 	 * 
 	 * @param file
 	 */
@@ -146,7 +152,8 @@ public class FileHandler {
 
 			} else {
 
-				System.err.println("Permission denied for modifiying " + file.getName() + "...Delete operation could not be performed");
+				System.err.println("Permission denied for modifiying " + file.getName()
+						+ "...Delete operation could not be performed");
 
 			}
 
@@ -156,16 +163,13 @@ public class FileHandler {
 			String per;
 			ArrayList<String> ar1 = new ArrayList<>(Arrays.asList(file.list()));
 			Iterator<String> itr = ar1.iterator();
-			System.out.println("The directory has the below contents :");
-
+			System.out.println("WARNING: The directory has the below contents :");
 			while (itr.hasNext()) {
 
 				System.out.println(itr.next());
 
 			}
-
 			System.out.println("Are you sure you want to delete the folder, press 'Y' to delete and 'N' to not delete");
-
 			while (true) {
 
 				per = in.next();
@@ -212,57 +216,59 @@ public class FileHandler {
 		File file = new File(rootpath);
 		File[] allContent = file.listFiles();
 		if (allContent != null && searchMode) {
-			
+
 			for (File inside : allContent) {
-				
+
 				if (inside.isDirectory())
 					searchResult = searchResult | searchFile(searchPhrase, type, inside.getAbsolutePath(), searchMode);
-				
+
 			}
 		}
-		
+
 		File[] content;
 		switch (type) {
-		
+
 		case EXACT:
 			content = (File[]) file.listFiles((dir, name) -> name.equals(searchPhrase));
 			break;
-			
+
 		case CONTAINS:
-			
+
 			content = (File[]) file.listFiles((dir, name) -> name.contains(searchPhrase));
 			break;
-			
+
 		case STARTS_WITH:
-			
+
 			content = (File[]) file.listFiles((dir, name) -> name.startsWith(searchPhrase));
 			break;
-			
+
 		case BY_EXTENSION:
-			
+
 			content = (File[]) file.listFiles((dir, name) -> name.endsWith(searchPhrase));
 			break;
-			
+
 		default:
-			
+
 			content = (File[]) file.listFiles((dir, name) -> name.contentEquals(searchPhrase));
 			break;
-			
+
 		}
 
 		if (content != null) {
-			
+
 			for (File matches : content) {
-				
-				System.out.println("File found inside given root directory, with file path:" + matches.getAbsolutePath());
+
+				System.out
+						.println("File found inside given root directory, with file path:" + matches.getAbsolutePath());
 				searchResult = true;
-				
+
 			}
-			
+
 		} else {
-			
+
 			searchResult = false;
 			
+
 		}
 
 		return searchResult;

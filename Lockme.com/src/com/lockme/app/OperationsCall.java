@@ -103,7 +103,7 @@ public class OperationsCall {
 		System.out.println("1.Retrieve the file names in an ascending order.");
 		System.out.println("2.Business-level operations.");
 		System.out.println("3.Change the root path.");
-		System.out.println("4.Close the aplication.");
+		System.out.println("4.Close the application.");
 		System.out.println("************************************************");
 		int choice = readInput();
 		
@@ -124,7 +124,7 @@ public class OperationsCall {
 
 		case 3:
 			
-			this.getroot();
+			getroot();
 			break;
 
 		case 4:
@@ -154,7 +154,7 @@ public class OperationsCall {
 		while (loop) {
 			
 			System.out.println("*********************************************");
-			System.out.println("Select from the below bussiness opertaions : ");
+			System.out.println("Select from the below business operations : ");
 			System.out.println("*********************************************");
 			System.out.println("1.Add a file to the existing directory list");
 			System.out.println("2.Delete a file from the application");
@@ -200,13 +200,17 @@ public class OperationsCall {
 				System.out.println("Enter Search Phrase or extension: ");
 				filename = readStringInput();
 				fh = new FileHandler(rootpath);
-				fh.searchFile(filename, type, this.rootpath, subSearch);
+				boolean found = false;
+				found = fh.searchFile(filename, type, this.rootpath, subSearch);
+				if(!found) {
+					System.out.println("Matches not found");
+				}
 				break;
 				
 			case 4:
 				
 				System.out.println("-----------------------------------------------------");
-				System.out.println("Options 4 selected, Navaigating back to the main menu");
+				System.out.println("Options 4 selected, Navigating back to the main menu");
 				System.out.println("-----------------------------------------------------");
 				loop = false;
 				break;
@@ -257,7 +261,7 @@ public class OperationsCall {
 		System.out.println("EXACT        --search returns file that is an exact match to search value.");
 		System.out.println("CONTAINS     --search returns file that contains search value.");
 		System.out.println("STARTS_WITH  --search returns files starting with search phrase.");
-		System.out.println("BY_EXTENSION --search returns file of the extension searched,");
+		System.out.println("BY_EXTENSION --search returns file of the extension searched.");
 		SearchType type;
 		
 		while (true) {
